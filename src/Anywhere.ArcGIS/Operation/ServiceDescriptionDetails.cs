@@ -67,6 +67,9 @@
         [IgnoreDataMember]
         public List<string> Capabilities { get { return string.IsNullOrWhiteSpace(CapabilitiesValue) ? null : CapabilitiesValue.Split(',').ToList(); } }
 
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
+
         [DataMember(Name = "description")]
         public string Description { get; set; }
 
@@ -82,11 +85,39 @@
         [DataMember(Name = "fullExtent")]
         public Extent FullExtent { get; set; }
 
+        [DataMember(Name = "timeInfo")]
+        public TimeInfo TimeInfo { get; set; }
+
         [DataMember(Name = "documentInfo")]
         public DocumentInfo DocumentInfo { get; set; }
 
         [DataMember(Name = "layers")]
         public List<LayerDetails> Layers { get; set; }
+    }
+
+    [DataContract]
+    public class TimeInfo
+    {
+        [DataMember(Name = "timeExtent")]
+        public List<long> TimeExtent { get; set; }
+
+        [DataMember(Name = "timeRelation")]
+        public string TimeRelation { get; set; }
+
+        [DataMember(Name = "defaultTimeInterval")]
+        public int DefaultTimeInterval { get; set; }
+
+        [DataMember(Name = "defaultTimeIntervalUnits")]
+        public string DefaultTimeIntervalUnits { get; set; }
+
+        [DataMember(Name = "defaultTimeWindow")]
+        public double DefaultTimeWindow { get; set; }
+
+        [DataMember(Name = "defaultTimeWindowUnits")]
+        public string DefaultTimeWindowUnits { get; set; }
+
+        [DataMember(Name = "hasLiveData")]
+        public bool HasLiveData { get; set; }
     }
 
     [DataContract]

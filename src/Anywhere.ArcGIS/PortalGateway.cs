@@ -46,7 +46,7 @@
             ITokenProvider tokenProvider = null;
             if (!string.IsNullOrWhiteSpace(info.OwningSystemUrl) && (info.OwningSystemUrl.StartsWith("http://www.arcgis.com", StringComparison.OrdinalIgnoreCase) || info.OwningSystemUrl.StartsWith("https://www.arcgis.com", StringComparison.OrdinalIgnoreCase)))
             {
-                tokenProvider = new ArcGISOnlineTokenProvider(username, password);
+                tokenProvider = new ArcGISOnlineTokenProvider(username, password, serializer: serializer, httpClientFunc: httpClientFunc);
             }
             else
             {
@@ -55,14 +55,16 @@
                     if (!info.AuthenticationInfo.TokenServicesUrl.StartsWith(gateway.RootUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         tokenProvider = new FederatedTokenProvider(
-                            new ServerFederatedWithPortalTokenProvider(info.AuthenticationInfo.TokenServicesUrl.Replace("/generateToken", ""), username, password),
+                            new ServerFederatedWithPortalTokenProvider(info.AuthenticationInfo.TokenServicesUrl.Replace("/generateToken", ""), username, password, serializer: serializer, httpClientFunc: httpClientFunc),
                             info.AuthenticationInfo.TokenServicesUrl.Replace("/generateToken", ""),
                             gateway.RootUrl,
-                            referer: info.AuthenticationInfo.TokenServicesUrl.Replace("/sharing/rest/generateToken", "/rest"));
+                            referer: info.AuthenticationInfo.TokenServicesUrl.Replace("/sharing/rest/generateToken", "/rest"),
+                            serializer: serializer, 
+                            httpClientFunc: httpClientFunc);
                     }
                     else
                     {
-                        tokenProvider = new TokenProvider(info.AuthenticationInfo?.TokenServicesUrl, username, password);
+                        tokenProvider = new TokenProvider(info.AuthenticationInfo?.TokenServicesUrl, username, password, serializer: serializer, httpClientFunc: httpClientFunc);
                     }
                 }
             }
@@ -235,22 +237,6 @@
             }
 
             return Get<ServiceDescriptionDetailsResponse, ServiceDescriptionDetails>(new ServiceDescriptionDetails(serviceEndpoint), ct);
-        }
-
-        /// <summary>
-        /// Return the layer description details for the requested endpoint
-        /// </summary>
-        /// <param name="layerEndpoint"></param>
-        /// <param name="ct"></param>
-        /// <returns>The layer description details</returns>
-        public virtual Task<ServiceLayerDescriptionResponse> DescribeLayer(IEndpoint layerEndpoint, CancellationToken ct = default(CancellationToken))
-        {
-            if (layerEndpoint == null)
-            {
-                throw new ArgumentNullException(nameof(layerEndpoint));
-            }
-
-            return Get<ServiceLayerDescriptionResponse, ServiceLayerDescription>(new ServiceLayerDescription(layerEndpoint), ct);
         }
 
         /// <summary>

@@ -112,10 +112,13 @@ namespace Anywhere.ArcGIS.Operation
 
         public string BuildAbsoluteUrl(string rootUrl)
         {
-            if (string.IsNullOrWhiteSpace(rootUrl)) throw new ArgumentNullException("rootUrl", "rootUrl is null.");
+            if (string.IsNullOrWhiteSpace(rootUrl))
+            {
+                throw new ArgumentNullException("rootUrl", "rootUrl is null.");
+            }
 
             return IsFederated
-                ? (DontForceHttps ? rootUrl.Replace("sharing/rest/", "") + "sharing/rest/" : rootUrl.Replace("http://", "https://").Replace("sharing/rest/", "") + "sharing/rest/") + RelativeUrl.Replace("tokens/", "")
+                ? (DontForceHttps ? rootUrl.Replace("sharing/rest/", "").Replace("sharing/", "") + "sharing/rest/" : rootUrl.Replace("http://", "https://").Replace("sharing/rest/", "").Replace("sharing/", "") + "sharing/rest/") + RelativeUrl.Replace("tokens/", "")
                 : (DontForceHttps ? rootUrl : rootUrl.Replace("http://", "https://")) + RelativeUrl;
         }
     }
@@ -202,11 +205,14 @@ namespace Anywhere.ArcGIS.Operation
 
         public string BuildAbsoluteUrl(string rootUrl)
         {
-            if (string.IsNullOrWhiteSpace(rootUrl)) throw new ArgumentNullException("rootUrl", "rootUrl is null.");
+            if (string.IsNullOrWhiteSpace(rootUrl))
+            {
+                throw new ArgumentNullException("rootUrl", "rootUrl is null.");
+            }
 
             return (DontForceHttps ?
-                rootUrl.Replace("sharing/rest/", "") + "sharing/rest/" :
-                rootUrl.Replace("http://", "https://").Replace("sharing/rest/", "") + "sharing/rest/") + RelativeUrl;
+                rootUrl.Replace("sharing/rest/", "").Replace("sharing/", "") + "sharing/rest/" :
+                rootUrl.Replace("http://", "https://").Replace("sharing/rest/", "").Replace("sharing/", "") + "sharing/rest/") + RelativeUrl;
         }
     }
 
@@ -221,6 +227,9 @@ namespace Anywhere.ArcGIS.Operation
         /// </summary>
         [DataMember(Name = "expires_in")]
         public long Expiry { get; set; }
+
+        [DataMember(Name = "error")]
+        public new ArcGISErrorDetail Error { get; set; }
 
         public Token AsToken()
         {
@@ -275,5 +284,29 @@ namespace Anywhere.ArcGIS.Operation
         /// </summary>
         [DataMember(Name = "ssl")]
         public bool AlwaysUseSsl { get; set; }
+
+        [DataMember(Name = "error")]
+        public new ArcGISErrorDetail Error { get; set; }
+    }
+
+    [DataContract]
+    public class ArcGISErrorDetail
+    {
+        [DataMember(Name = "code")]
+        public int Code { get; set; }
+
+        [DataMember(Name = "message")]
+        public string Message { get; set; }
+
+        [DataMember(Name = "details")]
+        public string Details { get; set; }
+
+        [DataMember(Name = "description")]
+        public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("Code {0}: {1}.{2}\n{3}", Code, Message, Description, Details == null ? "" : string.Join(" ", Details));
+        }
     }
 }
